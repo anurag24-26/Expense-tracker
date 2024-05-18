@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        body {
+
+            background: rgb(63, 94, 251);
+            background: radial-gradient(circle, rgba(63, 94, 251, 1) 0%, rgba(252, 70, 107, 1) 100%);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 30px;
+            font-weight: bolder;
+            font-family: cursive;
+
+        }
+
+        .form {
+            margin: 100px auto;
+            /* Center the div vertically and horizontally */
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 30px;
+            background-color: #6bdae2;
+            /* Set background color */
+            width: 400px;
+            /* Set the width of the form */
+            padding: 20px;
+            /* Add some padding */
+        }
+
+
+        .form input {
+            width: 200px;
+            height: 25px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+        }
+
+        .form button {
+            cursor: pointer;
+            width: 100px;
+            height: 28px;
+            border-radius: 20px;
+            margin-bottom: 5px;
+            transition: 0.2s all ease-in-out;
+        }
+
+        .form button:hover {
+            width: 100px;
+            height: 30px;
+            background-color: green;
+            border-radius: 20px;
+            margin-bottom: 5px;
+            transition: 0.2s all ease-in-out;
+        }
+
+        #expenseList {
+
+            font-size: 24px;
+            font-weight: bolder;
+            border-radius: 20px;
+            list-style-type: none;
+            /* Remove bullets from list items */
+            padding: 0;
+            /* Remove default padding */
+        }
+
+        #expenseList li {
+            background-color: rgb(187, 178, 187);
+            border-radius: 10px;
+            /* Apply different border radius to each list item */
+            padding: 5px;
+            width: 200px;
+            margin-left: 100px;
+            /* Add some padding to each list item */
+            margin-bottom: 5px;
+            /* Add some margin between list items */
+        }
+
+        #currentAmount {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 25px;
+            margin-left: 110px;
+            color: red;
+            background-color: rgb(171, 241, 232);
+            border-radius: 10px;
+            width: 150px;
+            font-weight: bolder;
+            /* Apply different border radius to each list item */
+            padding: 5px;
+            /* Add some padding to each list item */
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Personal expense tracker</h1>
+    
+    <div class="form">
+        <div id="currentAmount">Total Amount:Rs0</div>
+        <form>
+            Enter the item name: <br>
+            <input type="text" placeholder="Enter item name" id="itemName">
+            <br><!-- Added id="itemName" for easier access -->
+            Enter the price: <br>
+            <input type="number" placeholder="Enter Price" id="amount"> <br>
+            <button type="button" onclick="submitExpense()">Add Item</button> <!-- Changed button text to "Add Item" -->
+            <button type="button" onclick="clearData()">Clear All</button> <!-- Added clear button -->
+        </form>
+         <!-- Added a div to display current amount -->
+        <ul id="expenseList"></ul> <!-- Added ul to display added items -->
+        <div id="errorMessage" style="color: red; display: none;">Please enter both item name and price.</div>
+        <!-- Added error message -->
+    </div>
+    <script>
+        // Retrieve total amount and expenses from local storage if they exist
+        let recentAmount = parseInt(localStorage.getItem('totalAmount')) || 0;
+        let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        document.getElementById('currentAmount').textContent = `Total Amount:Rs${recentAmount}`;
+        renderExpenses();
+
+        function submitExpense() {
+            // Get the input values
+            let itemName = document.getElementById('itemName').value.trim();
+            let amount = parseInt(document.getElementById('amount').value);
+
+            // Validate input
+            if (!itemName || isNaN(amount)) {
+                document.getElementById('errorMessage').style.display = 'block';
+                return;
+            }
+
+            // Update total amount
+            recentAmount += amount;
+
+            // Save updated total amount to local storage
+            localStorage.setItem('totalAmount', recentAmount);
+
+            // Add the item to expenses array
+            expenses.push({ itemName, amount });
+
+            // Save updated expenses array to local storage
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+
+            // Update the display
+            document.getElementById('currentAmount').textContent = `Total Amount: Rs${recentAmount}`;
+            renderExpenses();
+            document.getElementById('errorMessage').style.display = 'none'; // Hide error message
+        }
+
+        function clearData() {
+            // Clear local storage
+            localStorage.removeItem('totalAmount');
+            localStorage.removeItem('expenses');
+
+            // Reset variables
+            recentAmount = 0;
+            expenses = [];
+
+            // Update the display
+            document.getElementById('currentAmount').textContent = `Total Amount:Rs${recentAmount}`;
+            document.getElementById('expenseList').innerHTML = ''; // Clear the expenses list
+            document.getElementById('errorMessage').style.display = 'none'; // Hide error message
+        }
+
+        function renderExpenses() {
+            let expenseList = document.getElementById('expenseList');
+            expenseList.innerHTML = ''; // Clear the previous list
+
+            // Render each expense item
+            expenses.forEach(expense => {
+                let listItem = document.createElement('li');
+                listItem.textContent = `${expense.itemName}:Rs${expense.amount}`;
+                expenseList.appendChild(listItem);
+            });
+        }
+        function updateTotalAmount(amount) {
+            let totalAmountElement = document.getElementById('currentAmount');
+            totalAmountElement.textContent = `Total Amount: $${amount}`;
+            if (amount > 500) {
+                totalAmountElement.classList.remove('green');
+                totalAmountElement.classList.add('red');
+            } else {
+                totalAmountElement.classList.remove('red');
+                totalAmountElement.classList.add('green');
+            }
+        }
+    </script>
+</body>
+
+</html>
